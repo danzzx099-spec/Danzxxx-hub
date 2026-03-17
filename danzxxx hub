@@ -1,0 +1,161 @@
+--// LOAD RAYFIELD
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Danzx Hub | Vacuum Brainrot FIX",
+   LoadingTitle = "Danzx Hub",
+   LoadingSubtitle = "Fix Version",
+   ConfigurationSaving = {Enabled = false}
+})
+
+local Tab = Window:CreateTab("Main", 4483362458)
+
+--// SERVICES
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+-- =========================
+-- REMOVE LUMPUR (FIXED)
+-- =========================
+local remove = false
+
+Tab:CreateToggle({
+   Name = "Remove Lumpur (FIX)",
+   CurrentValue = false,
+   Callback = function(v)
+      remove = v
+   end
+})
+
+RunService.RenderStepped:Connect(function()
+    if not remove then return end
+
+    local char = player.Character
+    if not char then return end
+
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("BasePart") and not v:IsDescendantOf(char) then
+            
+            local dist = (v.Position - root.Position).Magnitude
+            
+            if dist <= 60 then
+                
+                -- 🔥 DETEKSI LEBIH LUAS
+                if v.Position.Y < root.Position.Y + 2 then
+                    
+                    -- cek ukuran besar (tanah map)
+                    if v.Size.X > 15 and v.Size.Z > 15 then
+                        
+                        v.Transparency = 1
+                        v.CanCollide = false
+                        
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- =========================
+-- SPEED
+-- =========================
+Tab:CreateSlider({
+   Name = "Speed",
+   Range = {16,200},
+   Increment = 1,
+   CurrentValue = 16,
+   Callback = function(v)
+      pcall(function()
+         player.Character.Humanoid.WalkSpeed = v
+      end)
+   end
+})
+
+-- =========================
+-- NOCLIP
+-- =========================
+local noclip = false
+
+Tab:CreateToggle({
+   Name = "Noclip",
+   CurrentValue = false,
+   Callback = function(v)
+      noclip = v
+   end
+})
+
+RunService.Stepped:Connect(function()
+    if noclip then
+        local char = player.Character
+        if char then
+            for _, v in pairs(char:GetDescendants()) do
+                if v:IsA("BasePart") then
+                    v.CanCollide = false
+                end
+            end
+        end
+    end
+end)
+
+-- =========================
+-- FLY (FIX SMOOTH)
+-- =========================
+local flying = false
+local flySpeed = 50
+
+Tab:CreateToggle({
+   Name = "Fly",
+   CurrentValue = false,
+   Callback = function(v)
+      flying = v
+   end
+})
+
+Tab:CreateSlider({
+   Name = "Fly Speed",
+   Range = {20,200},
+   Increment = 1,
+   CurrentValue = 50,
+   Callback = function(v)
+      flySpeed = v
+   end
+})
+
+local bv, bg
+
+RunService.RenderStepped:Connect(function()
+    local char = player.Character
+    if not char then return end
+    
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    if flying then
+        if not bv then
+            bv = Instance.new("BodyVelocity", root)
+            bv.MaxForce = Vector3.new(9e9,9e9,9e9)
+        end
+        
+        if not bg then
+            bg = Instance.new("BodyGyro", root)
+            bg.MaxTorque = Vector3.new(9e9,9e9,9e9)
+        end
+        
+        bg.CFrame = workspace.CurrentCamera.CFrame
+        bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * flySpeed
+    else
+        if bv then bv:Destroy() bv = nil end
+        if bg then bg:Destroy() bg = nil end
+    end
+end)
+
+-- =========================
+Rayfield:Notify({
+   Title = "Danzx Hub",
+   Content = "Fix Script Aktif!",
+   Duration = 4
+})
